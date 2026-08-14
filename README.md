@@ -1,5 +1,13 @@
 # HackerWars Automator
 
+> **Unlike HExbot, which scraped and collected your data, this extension has no sockets — it doesn't even have hardcoded IP addresses or accounts in it.**
+>
+> The only hardcoded data is the preset names/sizes for the Spam, Warez, and Miner infection buttons:
+>
+> - **Spam** — `Super Spam.vspam` 1gb, `Advanced Spam.vspam` 236mb, `Decent Spam.vspam` 36mb
+> - **Warez** — `Super Warez.vwarez` 1gb, `Advanced Warez.vwarez` 236mb, `Decent Warez.vwarez` 36mb
+> - **Miner** — `Super Miner.vminer` 1.7gb, `Advanced Miner.vminer` 413mb, `Decent Miner.vminer` 63mb
+
 A manual-trigger browser extension (Manifest V3) that automates repetitive tasks in [hackerwars.io](https://hackerwars.io), a hacking-themed browser game. It adds an on-page overlay with start/stop controls for each automation; nothing runs until you trigger it.
 
 ## Features
