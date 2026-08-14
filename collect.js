@@ -60,9 +60,14 @@ const COLLECT_STEPS = {
   },
   buy_btc_submit: {
     timeout: 15000,
-    find: () => document.querySelector("#btc-submit"),
-    resolve: () => ({ next: "browse" }),
-    perform: (元素) => 元素.click(),
+    find: () => {
+      const 登录按钮 = document.querySelector("#btc-login");
+      if (登录按钮) return { kind: "login", el: 登录按钮 };
+      const 购买按钮 = document.querySelector("#btc-submit");
+      return 购买按钮 ? { kind: "buy", el: 购买按钮 } : null;
+    },
+    resolve: (找到结果) => ({ next: 找到结果.kind === "login" ? "buy_btc_click" : "browse" }),
+    perform: (找到结果) => 找到结果.el.click(),
   },
   browse: {
     timeout: 15000,

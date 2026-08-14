@@ -9,6 +9,5 @@
   await 运行步骤引擎("puzzleRunner", PUZZLE_STEPS);
   await 运行步骤引擎("massHackRunner", MASSHACK_STEPS);
   await 运行步骤引擎("collectRunner", COLLECT_STEPS);
-  await 运行步骤引擎("repGrindRunner", REP_GRIND_STEPS);
   await 运行步骤引擎("repKillRunner", REP_KILL_STEPS);
 })();

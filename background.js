@@ -127,7 +127,6 @@ chrome.tabs.onRemoved.addListener((标签页ID) => {
       "puzzleRunner",
       "massHackRunner",
       "collectRunner",
-      "repGrindRunner",
       "repKillRunner",
     ],
     ({
@@ -139,7 +138,6 @@ chrome.tabs.onRemoved.addListener((标签页ID) => {
       puzzleRunner,
       massHackRunner,
       collectRunner,
-      repGrindRunner,
       repKillRunner,
     }) => {
       const 更新集合 = {};
@@ -166,9 +164,6 @@ chrome.tabs.onRemoved.addListener((标签页ID) => {
       }
       if (collectRunner && collectRunner.tabId === 标签页ID && collectRunner.running) {
         更新集合.collectRunner = { ...collectRunner, running: false };
-      }
-      if (repGrindRunner && repGrindRunner.tabId === 标签页ID && repGrindRunner.running) {
-        更新集合.repGrindRunner = { ...repGrindRunner, running: false };
       }
       if (repKillRunner && repKillRunner.tabId === 标签页ID && repKillRunner.running) {
         更新集合.repKillRunner = { ...repKillRunner, running: false };

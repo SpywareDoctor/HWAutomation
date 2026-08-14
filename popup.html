@@ -183,7 +183,7 @@
     #hwauto-card label {
       font-size: 11px;
     }
-    #hwauto-card #logMonitorStatus, #hwauto-card #bgLogMonitorStatus, #hwauto-card #logWatcherStatus, #hwauto-card #gatherStatus, #hwauto-card #softwareGatherStatus, #hwauto-card #missionStatus, #hwauto-card #ddosStatus, #hwauto-card #researchStatus, #hwauto-card #puzzleStatus, #hwauto-card #massHackStatus, #hwauto-card #collectStatus, #hwauto-card #repGrindStatus, #hwauto-card #repKillStatus {
+    #hwauto-card #logMonitorStatus, #hwauto-card #bgLogMonitorStatus, #hwauto-card #logWatcherStatus, #hwauto-card #gatherStatus, #hwauto-card #softwareGatherStatus, #hwauto-card #missionStatus, #hwauto-card #ddosStatus, #hwauto-card #researchStatus, #hwauto-card #puzzleStatus, #hwauto-card #massHackStatus, #hwauto-card #collectStatus, #hwauto-card #repKillStatus {
       margin-top: 8px;
       min-height: 32px;
       font-size: 11px;
@@ -231,7 +231,7 @@
       padding: 4px 6px;
       font-size: 11px;
     }
-    #hwauto-card #selfTransferStatus, #hwauto-card #repGrindBankStatus {
+    #hwauto-card #selfTransferStatus {
       font-size: 11px;
       color: #5f6368;
       margin-top: 4px;
@@ -316,7 +316,6 @@
           <span class="panel-title">Missions</span>
         </div>
         <button class="menu-item" data-target="panel-mission">Mission Grinder</button>
-        <button class="menu-item" data-target="panel-repgrind">Rep Grind</button>
         <button class="menu-item" data-target="panel-repkill">Rep Kill</button>
       </div>
 
@@ -382,37 +381,6 @@
           <button id="collectStopBtn">Stop</button>
         </div>
         <div id="collectStatus">idle</div>
-      </section>
-
-      <section class="module-panel" id="panel-repgrind">
-        <div class="panel-header">
-          <button class="back-btn" data-back>&larr;</button>
-          <span class="panel-title">Rep Grind</span>
-        </div>
-        <p>Hacks the target IP below (exploit then bruteforce), waits, then stops — enter the next target and hit Start again.</p>
-        <label for="repGrindIp">Target IP (required for Use Exploit / Use Bruteforce)</label>
-        <input type="text" id="repGrindIp" placeholder="0.0.0.0" />
-        <div class="mission-types">
-          <label><input type="checkbox" id="repGrindUseExploit" /> Use Exploit</label>
-          <label><input type="checkbox" id="repGrindUseBruteforce" /> Use Bruteforce</label>
-          <label><input type="checkbox" id="repGrindBankTransfer" /> Bank Transfer</label>
-        </div>
-        <p>Note: bank transfer requires both accounts to be on the same bank (same Bank IP below).</p>
-        <div class="self-transfer">
-          <label for="repGrindBankAccountFrom">Bank account # (from)</label>
-          <input type="text" id="repGrindBankAccountFrom" placeholder="account #" />
-          <label for="repGrindBankAccountTo">Bank account # (to)</label>
-          <input type="text" id="repGrindBankAccountTo" placeholder="account #" />
-          <label for="repGrindBankIp">Bank IP</label>
-          <input type="text" id="repGrindBankIp" placeholder="0.0.0.0" />
-          <button id="repGrindBankSaveBtn">Save Bank Info</button>
-          <div id="repGrindBankStatus">not set</div>
-        </div>
-        <div class="button-row">
-          <button id="repGrindStartBtn">Start</button>
-          <button id="repGrindStopBtn">Stop</button>
-        </div>
-        <div id="repGrindStatus">idle</div>
       </section>
 
       <section class="module-panel" id="panel-repkill">

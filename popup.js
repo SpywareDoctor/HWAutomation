@@ -74,7 +74,6 @@ if (hasTabsApi) {
 const ALL_RUNNER_KEYS = [
   "researchRunner",
   "collectRunner",
-  "repGrindRunner",
   "repKillRunner",
   "logMonitor",
   "bgLogMonitor",
@@ -104,7 +103,6 @@ document.getElementById("stopAllBtn").addEventListener("click", async () => {
   log(stoppedCount > 0 ? `Stopped ${stoppedCount} running task(s).` : "Nothing was running.");
   renderResearchStatus();
   renderCollectStatus();
-  renderRepGrindStatus();
   renderRepKillStatus();
   renderLogMonitorStatus();
   渲染后台日志监控状态();
@@ -358,124 +356,6 @@ document.getElementById("collectStopBtn").addEventListener("click", async () => 
   renderCollectStatus();
 });
 
-async function renderRepGrindStatus() {
-  const { repGrindRunner } = await chrome.storage.local.get("repGrindRunner");
-  const el = document.getElementById("repGrindStatus");
-  if (!repGrindRunner) {
-    el.textContent = "idle";
-    return;
-  }
-  const lines = [];
-  if (repGrindRunner.running) {
-    lines.push(`running: ${repGrindRunner.step}`);
-  } else if (repGrindRunner.stuckAt) {
-    lines.push(`stuck at: ${repGrindRunner.stuckAt}`);
-  } else {
-    lines.push(`stopped (${repGrindRunner.step || "idle"})`);
-  }
-  lines.push(`grinds completed: ${repGrindRunner.completedCount || 0}`);
-  el.textContent = lines.join("\n") + formatHistory(repGrindRunner.history);
-}
-
-const repGrindUseExploitEl = document.getElementById("repGrindUseExploit");
-const repGrindUseBruteforceEl = document.getElementById("repGrindUseBruteforce");
-const repGrindIpEl = document.getElementById("repGrindIp");
-const repGrindBankTransferEl = document.getElementById("repGrindBankTransfer");
-const repGrindBankAccountFromEl = document.getElementById("repGrindBankAccountFrom");
-const repGrindBankAccountToEl = document.getElementById("repGrindBankAccountTo");
-const repGrindBankIpEl = document.getElementById("repGrindBankIp");
-const repGrindBankStatusEl = document.getElementById("repGrindBankStatus");
-
-async function loadRepGrindMethods() {
-  const { repGrindMethods } = await chrome.storage.local.get("repGrindMethods");
-  repGrindUseExploitEl.checked = repGrindMethods ? repGrindMethods.exploit : true;
-  repGrindUseBruteforceEl.checked = repGrindMethods ? repGrindMethods.bruteforce : true;
-}
-
-async function loadRepGrindBankAccount() {
-  const { repGrindBankAccount } = await chrome.storage.local.get("repGrindBankAccount");
-  const accountFrom = repGrindBankAccount?.accountFrom || "";
-  const accountTo = repGrindBankAccount?.accountTo || "";
-  const ip = repGrindBankAccount?.ip || "";
-  repGrindBankAccountFromEl.value = accountFrom;
-  repGrindBankAccountToEl.value = accountTo;
-  repGrindBankIpEl.value = ip;
-  repGrindBankStatusEl.textContent =
-    accountFrom || accountTo || ip ? `saved: from ${accountFrom || "-"} / to ${accountTo || "-"} / ip ${ip || "-"}` : "not set";
-}
-
-document.getElementById("repGrindBankSaveBtn").addEventListener("click", async () => {
-  const accountFrom = repGrindBankAccountFromEl.value.trim();
-  const accountTo = repGrindBankAccountToEl.value.trim();
-  const ip = repGrindBankIpEl.value.trim();
-  await chrome.storage.local.set({ repGrindBankAccount: { accountFrom, accountTo, ip } });
-  log("Bank transfer info saved.");
-  loadRepGrindBankAccount();
-});
-
-document.getElementById("repGrindStartBtn").addEventListener("click", async () => {
-  const useExploit = repGrindUseExploitEl.checked;
-  const useBruteforce = repGrindUseBruteforceEl.checked;
-  const useBankTransfer = repGrindBankTransferEl.checked;
-  const needsTarget = useExploit || useBruteforce;
-
-  const targetIp = repGrindIpEl.value.trim();
-  if (needsTarget && !targetIp) {
-    log("Enter a target IP before starting Rep Grind (needed for Use Exploit/Use Bruteforce).");
-    return;
-  }
-
-  const bankAccountFrom = repGrindBankAccountFromEl.value.trim();
-  const bankAccountTo = repGrindBankAccountToEl.value.trim();
-  const bankIp = repGrindBankIpEl.value.trim();
-  if (useBankTransfer && (!bankAccountFrom || !bankAccountTo || !bankIp)) {
-    log("Bank Transfer needs account from, account to, and Bank IP all filled in before starting.");
-    return;
-  }
-
-  if (!needsTarget && !useBankTransfer) {
-    log("Select Use Exploit, Use Bruteforce, or Bank Transfer before starting Rep Grind.");
-    return;
-  }
-
-  await chrome.storage.local.set({ repGrindMethods: { exploit: useExploit, bruteforce: useBruteforce } });
-
-  const startStep = needsTarget ? "goto_target" : "goto_bank";
-  const startUrl = needsTarget ? `https://hackerwars.io/internet?ip=${targetIp}` : `https://hackerwars.io/internet?ip=${bankIp}`;
-
-  const tab = await getActiveTab();
-  const { repGrindRunner: prev } = await chrome.storage.local.get("repGrindRunner");
-  await chrome.storage.local.set({
-    repGrindRunner: {
-      running: true,
-      tabId: tab.id,
-      step: startStep,
-      stuckAt: null,
-      useExploit,
-      useBruteforce,
-      repIp: targetIp,
-      useBankTransfer,
-      bankAccountFrom,
-      bankAccountTo,
-      bankIp,
-      bankPass: needsTarget ? undefined : 1,
-      completedCount: prev?.completedCount || 0,
-      startedAt: Date.now(),
-    },
-  });
-  navigateTab(tab.id, startUrl);
-  log(needsTarget ? `Rep grind started against ${targetIp}.` : `Rep grind (bank transfer only) started against bank ${bankIp}.`);
-  renderRepGrindStatus();
-});
-
-document.getElementById("repGrindStopBtn").addEventListener("click", async () => {
-  const { repGrindRunner } = await chrome.storage.local.get("repGrindRunner");
-  if (!repGrindRunner) return;
-  await chrome.storage.local.set({ repGrindRunner: { ...repGrindRunner, running: false } });
-  log("Rep grind stopped.");
-  renderRepGrindStatus();
-});
-
 async function renderRepKillStatus() {
   const { repKillRunner } = await chrome.storage.local.get("repKillRunner");
   const el = document.getElementById("repKillStatus");
@@ -520,6 +400,7 @@ document.getElementById("repKillStopBtn").addEventListener("click", async () => 
   log("Rep kill stopped.");
   renderRepKillStatus();
 });
+
 
 async function renderLogMonitorStatus() {
   const { logMonitor } = await chrome.storage.local.get("logMonitor");
@@ -1087,7 +968,6 @@ document.getElementById("massHackStopBtn").addEventListener("click", async () =>
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;
   if (changes.collectRunner) renderCollectStatus();
-  if (changes.repGrindRunner) renderRepGrindStatus();
   if (changes.repKillRunner) renderRepKillStatus();
   if (changes.logMonitor) renderLogMonitorStatus();
   if (changes.bgLogMonitor) 渲染后台日志监控状态();
@@ -1109,7 +989,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 renderCollectStatus();
-renderRepGrindStatus();
 renderRepKillStatus();
 renderLogMonitorStatus();
 渲染后台日志监控状态();
@@ -1124,8 +1003,6 @@ renderMassHackStatus();
 loadMissionTypeFilter();
 loadSelfTransferAccount();
 loadVddosOptions();
-loadRepGrindMethods();
-loadRepGrindBankAccount();
 loadCollectInterval();
 loadSetupIps();
 }
