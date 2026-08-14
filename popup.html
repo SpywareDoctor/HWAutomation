@@ -1,0 +1,598 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HackerWars Automator</title>
+  <style>
+    #hwauto-card, #hwauto-card * {
+      box-sizing: border-box;
+    }
+    #hwauto-card {
+      width: 270px;
+      background: #ffffff;
+      border: 1px solid #d0d0d0;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+      padding: 10px;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: #202124;
+    }
+    #hwauto-card.collapsed {
+      width: auto;
+      padding: 8px 10px;
+    }
+    #hwauto-card #hwauto-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    #hwauto-card #hwauto-title {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    #hwauto-card #hwauto-header-actions {
+      display: flex;
+      gap: 2px;
+    }
+    #hwauto-card .hwauto-icon-btn {
+      display: block;
+      width: auto;
+      margin-top: 0;
+      padding: 2px 6px;
+      background: none;
+      border: none;
+      border-radius: 4px;
+      color: #5f6368;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #hwauto-card .hwauto-icon-btn:hover {
+      background: #f1f3f4;
+    }
+    #hwauto-card.collapsed #hwauto-content {
+      display: none;
+    }
+    #hwauto-card #stopAllBtn {
+      background: #d93025;
+      border-color: #d93025;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    #hwauto-card #stopAllBtn:hover {
+      background: #b7261b;
+      border-color: #b7261b;
+    }
+    #hwauto-card button {
+      display: block;
+      width: 100%;
+      padding: 6px 8px;
+      margin-top: 6px;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #202124;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #hwauto-card button[id$="StartBtn"] {
+      background: #d93025;
+      border-color: #d93025;
+      color: #ffffff;
+    }
+    #hwauto-card button[id$="StartBtn"]:disabled {
+      background: #f3b4ae;
+      border-color: #f3b4ae;
+      cursor: not-allowed;
+    }
+    #hwauto-card button[id$="StopBtn"] {
+      background: #5f6368;
+      border-color: #5f6368;
+      color: #ffffff;
+    }
+    #hwauto-card button[id$="StopBtn"]:disabled {
+      background: #c4c7c5;
+      border-color: #c4c7c5;
+      cursor: not-allowed;
+    }
+    #hwauto-card .button-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    #hwauto-card .button-row button {
+      flex: 1;
+      margin-top: 0;
+    }
+    #hwauto-card .vddos-preset-spam {
+      background: #1a73e8;
+      border-color: #1a73e8;
+      color: #ffffff;
+    }
+    #hwauto-card .vddos-preset-spam:hover {
+      background: #1558b0;
+      border-color: #1558b0;
+    }
+    #hwauto-card .vddos-preset-warez {
+      background: #1e8e3e;
+      border-color: #1e8e3e;
+      color: #ffffff;
+    }
+    #hwauto-card .vddos-preset-warez:hover {
+      background: #166b2e;
+      border-color: #166b2e;
+    }
+    #hwauto-card .vddos-preset-miner {
+      background: #8430ce;
+      border-color: #8430ce;
+      color: #ffffff;
+    }
+    #hwauto-card .vddos-preset-miner:hover {
+      background: #6a26a8;
+      border-color: #6a26a8;
+    }
+    #hwauto-card #mainMenu.hidden {
+      display: none;
+    }
+    #hwauto-card .menu-item {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      background: #ffffff;
+    }
+    #hwauto-card .menu-item:hover {
+      background: #f1f3f4;
+    }
+    #hwauto-card .module-panel {
+      display: none;
+    }
+    #hwauto-card .module-panel.active {
+      display: block;
+    }
+    #hwauto-card .submenu {
+      display: none;
+    }
+    #hwauto-card .submenu.active {
+      display: block;
+    }
+    #hwauto-card .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    #hwauto-card .back-btn {
+      display: block;
+      width: auto;
+      padding: 4px 10px;
+      margin-top: 0;
+      font-size: 13px;
+    }
+    #hwauto-card .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    #hwauto-card p {
+      font-size: 11px;
+      color: #5f6368;
+      margin: 6px 0;
+      line-height: 1.3;
+    }
+    #hwauto-card label {
+      font-size: 11px;
+    }
+    #hwauto-card #logMonitorStatus, #hwauto-card #bgLogMonitorStatus, #hwauto-card #logWatcherStatus, #hwauto-card #gatherStatus, #hwauto-card #softwareGatherStatus, #hwauto-card #missionStatus, #hwauto-card #ddosStatus, #hwauto-card #researchStatus, #hwauto-card #puzzleStatus, #hwauto-card #massHackStatus, #hwauto-card #collectStatus, #hwauto-card #repGrindStatus, #hwauto-card #repKillStatus {
+      margin-top: 8px;
+      min-height: 32px;
+      font-size: 11px;
+      line-height: 1.3;
+      color: #5f6368;
+      background: #f4f4f4;
+      padding: 6px;
+      border-radius: 4px;
+      white-space: pre-line;
+    }
+    #hwauto-card #log {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid #eee;
+      font-size: 11px;
+      color: #5f6368;
+      white-space: pre-wrap;
+      max-height: 90px;
+      overflow-y: auto;
+    }
+    #hwauto-card .mission-types {
+      margin-top: 6px;
+      font-size: 11px;
+    }
+    #hwauto-card .mission-types label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 0;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    #hwauto-card .self-transfer {
+      margin-top: 8px;
+    }
+    #hwauto-card .self-transfer label {
+      display: block;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+    #hwauto-card .self-transfer input, #hwauto-card .self-transfer select {
+      display: block;
+      width: 100%;
+      margin-top: 2px;
+      padding: 4px 6px;
+      font-size: 11px;
+    }
+    #hwauto-card #selfTransferStatus, #hwauto-card #repGrindBankStatus {
+      font-size: 11px;
+      color: #5f6368;
+      margin-top: 4px;
+    }
+    #hwauto-card .field-list {
+      margin-top: 8px;
+    }
+    #hwauto-card .field-list label {
+      display: block;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+    #hwauto-card .field-list textarea {
+      display: block;
+      width: 100%;
+      margin-top: 2px;
+      padding: 4px 6px;
+      font-size: 11px;
+      font-family: inherit;
+      resize: vertical;
+    }
+    #hwauto-card .field-list input {
+      display: block;
+      width: 100%;
+      margin-top: 2px;
+      padding: 4px 6px;
+      font-size: 11px;
+    }
+    #hwauto-card #vddosOptionsStatus, #hwauto-card #setupStatus {
+      font-size: 11px;
+      color: #5f6368;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="hwauto-card">
+    <div id="hwauto-header">
+      <span id="hwauto-title">HackerWars Automator</span>
+      <div id="hwauto-header-actions">
+        <button id="hwauto-hide-toggle" class="hwauto-icon-btn" aria-label="Hide overlay">&#10005;</button>
+        <button id="hwauto-collapse-toggle" class="hwauto-icon-btn" aria-label="Collapse">&#9660;</button>
+      </div>
+    </div>
+
+    <div id="hwauto-content">
+      <div id="mainMenu">
+        <button class="menu-item" data-group="submenu-tools">Tools</button>
+        <button class="menu-item" data-group="submenu-logs">Logs</button>
+        <button class="menu-item" data-group="submenu-missions">Missions</button>
+        <button class="menu-item" id="setupBtn">Setup</button>
+        <button id="stopAllBtn">Stop All</button>
+      </div>
+
+      <div class="submenu" id="submenu-tools">
+        <div class="panel-header">
+          <button class="back-btn" data-back-to-main>&larr;</button>
+          <span class="panel-title">Tools</span>
+        </div>
+        <button class="menu-item" data-target="panel-research">Research 任务</button>
+        <button class="menu-item" data-target="panel-collect">Collect 任务</button>
+        <button class="menu-item" data-target="panel-puzzle">Puzzle 进行中</button>
+        <button class="menu-item" data-target="panel-masshack">Mass Hack</button>
+        <button class="menu-item" data-target="panel-infection">Infection Module</button>
+        <button class="menu-item" data-target="panel-softwaregather">Gather Tool</button>
+      </div>
+
+      <div class="submenu" id="submenu-logs">
+        <div class="panel-header">
+          <button class="back-btn" data-back-to-main>&larr;</button>
+          <span class="panel-title">Logs</span>
+        </div>
+        <button class="menu-item" data-target="panel-logmonitor">Log Monitor</button>
+        <button class="menu-item" data-target="panel-bgmonitor">后台 Log Monitor</button>
+        <button class="menu-item" data-target="panel-logwatcher">Log Watcher</button>
+        <button class="menu-item" data-target="panel-loggather">Log Gather</button>
+      </div>
+
+      <div class="submenu" id="submenu-missions">
+        <div class="panel-header">
+          <button class="back-btn" data-back-to-main>&larr;</button>
+          <span class="panel-title">Missions</span>
+        </div>
+        <button class="menu-item" data-target="panel-mission">Mission Grinder</button>
+        <button class="menu-item" data-target="panel-repgrind">Rep Grind</button>
+        <button class="menu-item" data-target="panel-repkill">Rep Kill</button>
+      </div>
+
+      <section class="module-panel" id="panel-setup">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Setup</span>
+        </div>
+        <p>IP addresses shared across the extension (Mission Grinder's self-transfer bank dropdown, Infection Module's download center). Any of these can be left blank for now — saving works fine with gaps, just fill them in when you have them.</p>
+        <div class="field-list">
+          <label for="setupIpDownloadCenter">Download Center</label>
+          <input type="text" id="setupIpDownloadCenter" placeholder="0.0.0.0" />
+          <label for="setupIpFirstInternational">First International</label>
+          <input type="text" id="setupIpFirstInternational" placeholder="0.0.0.0" />
+          <label for="setupIpHebc">HEBC</label>
+          <input type="text" id="setupIpHebc" placeholder="0.0.0.0" />
+          <label for="setupIpAmericanExpense">American Expense</label>
+          <input type="text" id="setupIpAmericanExpense" placeholder="0.0.0.0" />
+          <label for="setupIpSwissInternationalBank">Swiss International Bank</label>
+          <input type="text" id="setupIpSwissInternationalBank" placeholder="0.0.0.0" />
+          <label for="setupIpUltimateBank">Ultimate Bank</label>
+          <input type="text" id="setupIpUltimateBank" placeholder="0.0.0.0" />
+        </div>
+        <button id="setupSaveBtn">Save Setup</button>
+        <div id="setupStatus">not set</div>
+      </section>
+
+      <section class="module-panel" id="panel-research">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Research 任务</span>
+        </div>
+        <label for="researchCycles">Cycles per run</label>
+        <select id="researchCycles">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+        <div class="button-row">
+          <button id="researchStartBtn">Start (on current university page)</button>
+          <button id="researchStopBtn">Stop</button>
+        </div>
+        <div id="researchStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-collect">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Collect 任务</span>
+        </div>
+        <p>Collects idle income, blanks the log, then waits and repeats — no timer to watch.</p>
+        <label for="collectIntervalMinutes">Collect interval (minutes, min 10.5)</label>
+        <input type="number" id="collectIntervalMinutes" min="10.5" step="0.5" placeholder="60" />
+        <div class="button-row">
+          <button id="collectStartBtn">Start</button>
+          <button id="collectStopBtn">Stop</button>
+        </div>
+        <div id="collectStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-repgrind">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Rep Grind</span>
+        </div>
+        <p>Hacks the target IP below (exploit then bruteforce), waits, then stops — enter the next target and hit Start again.</p>
+        <label for="repGrindIp">Target IP (required for Use Exploit / Use Bruteforce)</label>
+        <input type="text" id="repGrindIp" placeholder="0.0.0.0" />
+        <div class="mission-types">
+          <label><input type="checkbox" id="repGrindUseExploit" /> Use Exploit</label>
+          <label><input type="checkbox" id="repGrindUseBruteforce" /> Use Bruteforce</label>
+          <label><input type="checkbox" id="repGrindBankTransfer" /> Bank Transfer</label>
+        </div>
+        <p>Note: bank transfer requires both accounts to be on the same bank (same Bank IP below).</p>
+        <div class="self-transfer">
+          <label for="repGrindBankAccountFrom">Bank account # (from)</label>
+          <input type="text" id="repGrindBankAccountFrom" placeholder="account #" />
+          <label for="repGrindBankAccountTo">Bank account # (to)</label>
+          <input type="text" id="repGrindBankAccountTo" placeholder="account #" />
+          <label for="repGrindBankIp">Bank IP</label>
+          <input type="text" id="repGrindBankIp" placeholder="0.0.0.0" />
+          <button id="repGrindBankSaveBtn">Save Bank Info</button>
+          <div id="repGrindBankStatus">not set</div>
+        </div>
+        <div class="button-row">
+          <button id="repGrindStartBtn">Start</button>
+          <button id="repGrindStopBtn">Stop</button>
+        </div>
+        <div id="repGrindStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-repkill">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Rep Kill</span>
+        </div>
+        <p>Grabs any Destroy Server / Delete Software / Steal Software mission, accepts it, aborts it, repeats.</p>
+        <div class="button-row">
+          <button id="repKillStartBtn">Start</button>
+          <button id="repKillStopBtn">Stop</button>
+        </div>
+        <div id="repKillStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-logmonitor">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Log Monitor</span>
+        </div>
+        <div class="button-row">
+          <button id="logMonitorStartBtn">Start Monitor</button>
+          <button id="logMonitorStopBtn">Stop Monitor</button>
+        </div>
+        <div id="logMonitorStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-bgmonitor">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">后台 Log Monitor</span>
+        </div>
+        <p>无需标签页常驻 /log — 每隔几分钟由后台 service worker 直接轮询，可与手动游戏同时运行。发现新内容时会在工具栏图标上显示红色角标。</p>
+        <div class="button-row">
+          <button id="bgLogMonitorStartBtn">Start</button>
+          <button id="bgLogMonitorStopBtn">Stop</button>
+        </div>
+        <button id="bgLogMonitorClearAlertBtn">Clear Alert</button>
+        <div id="bgLogMonitorStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-logwatcher">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Log Watcher</span>
+        </div>
+        <p>Sits on whatever page you start it from (e.g. a target's log page) and reloads at a random 1-3s interval, gathering IPs each pass — racing to catch attacker IPs before the target can log in and clear their own log.</p>
+        <div class="button-row">
+          <button id="logWatcherStartBtn">Start (on current page)</button>
+          <button id="logWatcherStopBtn">Stop</button>
+        </div>
+        <div id="logWatcherStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-loggather">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Log Gather</span>
+        </div>
+        <div id="gatherStatus">0 IPs gathered</div>
+        <button id="gatherExportBtn">Export Gathered IPs</button>
+        <button id="gatherClearBtn">Clear Gathered IPs</button>
+      </section>
+
+      <section class="module-panel" id="panel-softwaregather">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Gather Tool</span>
+        </div>
+        <p>While enabled, scrapes every connected target's software (name/version/size, only items with a download option) the moment you connect — keyed by IP, so revisiting a target just refreshes its entry. Export as CSV.</p>
+        <div class="button-row">
+          <button id="softwareGatherStartBtn">Start</button>
+          <button id="softwareGatherStopBtn">Stop</button>
+        </div>
+        <div id="softwareGatherStatus">stopped</div>
+        <button id="softwareGatherExportBtn">Export CSV</button>
+        <button id="softwareGatherClearBtn">Clear Gathered Software</button>
+      </section>
+
+      <section class="module-panel" id="panel-mission">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Mission Grinder</span>
+        </div>
+        <div class="mission-types">
+          <label><input type="checkbox" id="missionTypeDelete" /> Delete software</label>
+          <label><input type="checkbox" id="missionTypeSteal" /> Steal software</label>
+          <label><input type="checkbox" id="missionTypeBank" /> Check bank status</label>
+          <label><input type="checkbox" id="missionTypeTransfer" /> Transfer money</label>
+        </div>
+        <div class="self-transfer">
+          <label for="selfTransferAccount">Self-transfer account #</label>
+          <input type="text" id="selfTransferAccount" placeholder="account #" />
+          <label for="selfTransferIp">Self-transfer bank</label>
+          <select id="selfTransferIp">
+            <option value="">Select a bank…</option>
+            <option value="firstInternational">First International</option>
+            <option value="hebc">HEBC</option>
+            <option value="americanExpense">American Expense</option>
+            <option value="swissInternationalBank">Swiss International Bank</option>
+            <option value="ultimateBank">Ultimate Bank</option>
+          </select>
+          <button id="selfTransferSaveBtn">Save Account</button>
+          <div id="selfTransferStatus"></div>
+        </div>
+        <div class="button-row">
+          <button id="missionStartBtn">Start</button>
+          <button id="missionStopBtn">Stop</button>
+        </div>
+        <div id="missionStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-infection">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Infection Module</span>
+        </div>
+        <div class="field-list">
+          <label for="ddosIpList">IP list (optional, one per line — leave blank to auto-scrape /hdb)</label>
+          <textarea id="ddosIpList" rows="3" placeholder="1.2.3.4&#10;5.6.7.8"></textarea>
+        </div>
+        <div class="field-list">
+          <label for="vddosOptions">病毒 options (one per line: "name size")</label>
+          <textarea id="vddosOptions" rows="2" placeholder="Ultra Warez.vwarez 1331.2mb&#10;Super Warez.vwarez 1024mb&#10;Advanced Warez.vwarez 236mb&#10;Decent Warez.vwarez 36mb&#10;次随机.warez 20gb"></textarea>
+          <div class="button-row">
+            <button id="vddosPresetSpamBtn" class="vddos-preset-spam">Spam</button>
+            <button id="vddosPresetWarezBtn" class="vddos-preset-warez">Warez</button>
+            <button id="vddosPresetMinerBtn" class="vddos-preset-miner">Miner</button>
+          </div>
+          <label for="vddosMaxMinutes">Max upload time per file (minutes)</label>
+          <input type="number" id="vddosMaxMinutes" min="1" step="1" placeholder="5" />
+          <button id="vddosOptionsSaveBtn">Save Virus Options</button>
+          <div id="vddosOptionsStatus">not set — using built-in defaults</div>
+        </div>
+        <button id="vddosClearCacheBtn">Clear Link Cache</button>
+        <div class="button-row">
+          <button id="ddosStartBtn">Start</button>
+          <button id="ddosStopBtn">Stop</button>
+        </div>
+        <div id="ddosStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-puzzle">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Puzzle 进行中</span>
+        </div>
+        <p>新账号：两个字段都留空，从"First Puzzle"入侵目标页面开始。断点续做：填入你当前所在（或即将入侵）的目标IP，以及对应的谜题编号 — 之后会照常入侵、下载安装crc、再打开谜题，和链条里其他每一台机器一样。</p>
+        <label for="puzzleStartNumber">起始谜题 # (blank = 1)</label>
+        <input type="number" id="puzzleStartNumber" min="1" max="47" step="1" placeholder="1" />
+        <label for="puzzleResumeIp">Resume at target IP (blank = use "First Puzzle" link)</label>
+        <input type="text" id="puzzleResumeIp" placeholder="0.0.0.0" />
+        <div class="button-row">
+          <button id="puzzleStartBtn">Start</button>
+          <button id="puzzleStopBtn">Stop</button>
+        </div>
+        <button id="puzzleContinueBtn">Continue (after solving)</button>
+        <div id="puzzleStatus">idle</div>
+      </section>
+
+      <section class="module-panel" id="panel-masshack">
+        <div class="panel-header">
+          <button class="back-btn" data-back>&larr;</button>
+          <span class="panel-title">Mass Hack</span>
+        </div>
+        <div class="field-list">
+          <label for="massHackIpList">IP list (one per line)</label>
+          <textarea id="massHackIpList" rows="4" placeholder="1.2.3.4&#10;5.6.7.8"></textarea>
+        </div>
+        <div class="button-row">
+          <button id="massHackStartBtn">Start</button>
+          <button id="massHackStopBtn">Stop</button>
+        </div>
+        <div id="massHackStatus">idle</div>
+      </section>
+
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Claude Code
+.claude/
+.claude.json
+CLAUDE.md
+.mcp.json
+
+# OS junk
+.DS_Store
+Thumbs.db
